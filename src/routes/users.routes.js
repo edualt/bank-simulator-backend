@@ -9,5 +9,7 @@ router.post("/", UserMethods.addUser);
 router.put("/:id", UserMethods.updateUser);
 router.delete("/:id", UserMethods.deleteUser);
 router.get("/verifyAccountNumber", UserMethods.getAllAccountNumber);
-
+router.get("/personal/:id", UserMethods.getPersonalAccount);
+router.get("/empresarial/:id", UserMethods.getEmpresarialAccount);
+router.post("/rfc", UserMethods.getIdbyRFC);
 export default router;

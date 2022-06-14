@@ -36,16 +36,16 @@ INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(1, '4152123456789
 INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(1, '4152123456789111', '1111', 2000);
 INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(2, '4152123456789012', '2222', 1200);
 INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(2, '3142123456789012', '1222', 1233);
-INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456789111', '1001', 1400);
-INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456781111', '1101', 1500);
-INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456711111', '1101', 1500);
-INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456111111', '1101', 1500);
+INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456789111', '1001', 5900);
+INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456781111', '1101', 2300);
+INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456711111', '1101', 5500);
+INSERT INTO cuenta_empresarial(id, c_empresarial, nip, saldo) VALUES(1, '3142123456111111', '1101', 9400);
 
 
 INSERT INTO users(rfc, first_name, last_name) VALUES('NNAA03092TRES', 'Nombre', 'Apellido');
 INSERT INTO users(rfc, first_name, last_name) VALUES('AAHE030CUATRO', 'Alexis', 'Altuzar');
-INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(3, '415212345678tres', '2222', 1200);
-INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(4, '4152123456cuatro', '2222', 1200);
+INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(3, '415212345678tres', '2222', 37);
+INSERT INTO cuenta_personal(id, c_personal, nip, saldo) VALUES(4, '4152123456cuatro', '2222', 12560);
 
 SHOW TABLES;
 
@@ -71,12 +71,20 @@ SELECT * FROM info_user;
 SELECT u.id, u.rfc, u.first_name, u.last_name, p.c_personal, p.nip, p.saldo, e.c_empresarial, e.nip, e.saldo FROM users u INNER JOIN cuenta_personal p ON u.id = p.id INNER JOIN cuenta_empresarial e ON u.id = e.id;
 
 SELECT * FROM users;
-SELECT * FROM cuenta_personal;
+SELECT * FROM cuenta_personal where id=9;
+SELECT * FROM cuenta_empresarial WHERE id=9;
+
+(SELECT * FROM cuenta_personal where id=1) UNION (SELECT * FROM cuenta_empresarial WHERE id=1);
+
 SELECT e.id, e.c_empresarial, e.nip, u.id, u.first_name, u.last_name  FROM cuenta_empresarial INNER JOIN users u;
 
+SELECT u.id, u.rfc, u.first_name, e.c_empresarial, e.nip as nip_e, p.c_personal, p.nip FROM users u JOIN cuenta_personal p ON u.id=p.id=1 JOIN cuenta_empresarial e ON u.id=e.id=1;
 
-
-SELECT * FROM users u INNER JOIN cuenta_personal p ON u.id=p.id;
+SELECT u.id, e.c_empresarial, e.nip FROM users u INNER JOIN cuenta_empresarial e ON u.id=2;
+(SELECT u.id, u.rfc, u.first_name, e.c_empresarial as num_cuenta, e.nip, e.saldo FROM users u INNER JOIN cuenta_empresarial e ON u.id=2) UNION (SELECT u.id, u.rfc, u.first_name, p.c_personal, p.nip, p.saldo FROM users u INNER JOIN cuenta_personal p ON u.id=2);
 
 ALTER TABLE users DROP PRIMARY KEY;
 ALTER TABLE migrations ADD id INT PRIMARY KEY AUTO_INCREMENT;
+
+SELECT * FROM cuenta_personal WHERE id=11;
+SELECT * FROM users u JOIN cuenta_personal p ON u.id=9=p.id=9;

@@ -1,4 +1,5 @@
 import { getConnection } from '../database/database';
+import { generateUniqueId } from '../utils/uniqueAccount';
 
 const getUsers = async (req, res) => {
     try {
@@ -17,7 +18,7 @@ const getUser = async (req, res) => {
     try {
         const { id } = req.params;
         const connection = await getConnection();
-        const result = await connection.query("SELECT u.id, u.rfc, u.first_name, u.last_name, p.c_personal, p.nip, p.saldo, e.c_empresarial, e.nip as nip_e, e.saldo as saldo_e FROM users u JOIN cuenta_personal p ON u.id = ? INNER JOIN cuenta_empresarial e ON u.id = ?", [id, id]);
+        const result = await connection.query("SELECT * FROM users WHERE id=?", id);
         //get rfc from json obtained from request
 
         res.json(result);
@@ -40,15 +41,13 @@ const addUser = async (req, res) => {
         var empresarial_account = '3142'
         var account_number = '';
         
-        
-        while (account_number.length < 12) {
-            account_number = Math.floor(Math.random() * 1E12).toString();
-        }
 
         const user = { rfc, first_name, last_name };
         
 
         const connection = await getConnection();
+
+        var account_number = generateUniqueId({ length: 12, useLetters: false })
 
         //check if user already exists
         const result = await connection.query("SELECT * FROM users WHERE rfc = ?", rfc);
@@ -124,23 +123,6 @@ const addUser = async (req, res) => {
     }
 }
 
-const setAccountNumber = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        //generate 16 digit account number
-
-        const connection = await getConnection();
-
-        //evalue first 4 digits of account number
-
-    }
-    catch (error) {
-        res.status(500);
-        res.send(error.message);
-    }
-}
-
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -187,7 +169,44 @@ const getAllAccountNumber = async (req, res) => {
     }
 };
 
+const getPersonalAccount = async (req, res) => {
+    try{
+        const { id } = req.params;
+        const connection = await getConnection();
+        const result = await connection.query('SELECT * FROM users u JOIN cuenta_personal p ON u.id=? and p.id=?', [id, id])
+        res.json(result)
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
 
+const getEmpresarialAccount = async (req, res) => {
+    try{
+        const { id } = req.params;
+        const connection = await getConnection();
+        const result = await connection.query('SELECT * FROM users u JOIN cuenta_empresarial e ON u.id=? and e.id=?', [id, id])
+        res.json(result)
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+const getIdbyRFC = async (req, res) => {
+    try{
+        const { rfc } = req.body;
+        const connection = await getConnection();
+        const result = await connection.query('SELECT id FROM users WHERE rfc=?', [rfc])
+        res.json(result)
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
 
 export const methods = {
     getUsers,
@@ -195,5 +214,8 @@ export const methods = {
     addUser,
     updateUser,
     deleteUser,
-    getAllAccountNumber
+    getAllAccountNumber,
+    getPersonalAccount,
+    getEmpresarialAccount,
+    getIdbyRFC
 };

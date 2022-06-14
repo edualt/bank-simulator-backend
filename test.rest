@@ -1,11 +1,33 @@
-GET  http://127.0.0.1:4000/api/users/7 HTTP/1.1
+POST  http://127.0.0.1:4000/api/users/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "rfc": "XDOTRORFC1000",
+    "rfc": "XDOTRORPRUEBA",
     "first_name": "Fernando",
     "last_name": "Guerrero",
     "nip": "0909",
     "tipo_cuenta": "Personal"
 
 }
+
+###
+
+POST  http://127.0.0.1:4000/api/users/rfc HTTP/1.1
+Content-Type: application/json
+
+{
+    "rfc": "HEAE030929JKL"
+}
+
+###
+
+GET http://127.0.0.1:4000/api/users/ HTTP/1.1
+
+###GET PERSONAL ACCOUNT
+
+GET http://127.0.0.1:4000/api/users/personal/11 HTTP/1.1
+
+###GET EMPRESARIAL ACCOUNT
+
+GET http://127.0.0.1:4000/api/users/empresarial/1 HTTP/1.1
+
