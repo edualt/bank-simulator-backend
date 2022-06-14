@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS info_user(
     CONSTRAINT fk_empresarial FOREIGN KEY (c_empresarial) REFERENCES cuenta_empresarial(c_empresarial)
 );
 
-SELECT u.id, u.rfc, u.first_name, u.last_name, p.c_personal, p.nip, p.saldo, e.c_empresarial, e.nip, e.saldo FROM users u INNER JOIN cuenta_personal p ON u.id = 1 INNER JOIN cuenta_empresarial e ON u.id = 1;
+SELECT * FROM users u  JOIN cuenta_personal p ON u.id = p.id   JOIN cuenta_empresarial e ON u.id = e.id ;
 
 
 SELECT * FROM info_user;
@@ -72,7 +72,9 @@ SELECT u.id, u.rfc, u.first_name, u.last_name, p.c_personal, p.nip, p.saldo, e.c
 
 SELECT * FROM users;
 SELECT * FROM cuenta_personal;
-SELECT * FROM cuenta_empresarial;
+SELECT e.id, e.c_empresarial, e.nip, u.id, u.first_name, u.last_name  FROM cuenta_empresarial INNER JOIN users u;
+
+
 
 SELECT * FROM users u INNER JOIN cuenta_personal p ON u.id=p.id;
 

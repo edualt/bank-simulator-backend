@@ -8,6 +8,6 @@ router.get("/:id", UserMethods.getUser);
 router.post("/", UserMethods.addUser);
 router.put("/:id", UserMethods.updateUser);
 router.delete("/:id", UserMethods.deleteUser);
-router.get("verifyAccountNumber/", UserMethods.getAllAccountNumber);
+router.get("/verifyAccountNumber", UserMethods.getAllAccountNumber);
 
 export default router;
