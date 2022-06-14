@@ -36,11 +36,104 @@ const addUser = async (req, res) => {
             res.status(400).json({message:"Faltan datos"});
         }
 
+        const account_number = Math.floor(Math.random()*1E16).toString(16);
+        const tipo_cuenta = req.body.tipo_cuenta;
+        const nip = req.body.nip;
+
         const user = { rfc, first_name, last_name };
+        const connection = await getConnection();
+
+        //get all account numbers
+        const allAccountNumbers = await connection.query('(SELECT e.c_empresarial FROM cuenta_empresarial e) UNION (SELECT p.c_personal FROM cuenta_personal p)');
+
+        //check if account number already exists
+        let accountNumberExists = false;
+        allAccountNumbers.forEach(accountNumber => {
+            if(account_number===accountNumber.c_empresarial || account_number===accountNumber.c_personal){
+                accountNumberExists = true;
+            }
+        }
+        );
+
+        if(accountNumberExists){
+            res.status(400).json({message:"Cuenta ya existe"});
+        }
+        else{
+            if(tipo_cuenta==="empresarial"){
+                await connection.query('INSERT INTO users SET ?', user);
+
+                //get user id
+                const userId = await connection.query('SELECT id FROM users WHERE rfc = ?', rfc);
+                const id = userId[0].id;
+
+                await connection.query('INSERT INTO cuenta_empresarial (id, c_empresarial, nip, saldo) VALUES (?, ?, ?, ?)', [id, account_number, nip, 0]);
+            }
+            else{
+                await connection.query('INSERT INTO users SET ?', user)
+
+                const userId = await connection.query('SELECT id FROM users WHERE rfc = ?', rfc);
+                const id = userId[0].id;
+
+                await connection.query('INSERT INTO cuenta_personal (c_personal, nip, saldo) VALUES (?, ?, ?, ?)', [id, account_number, nip, 0]);
+            }
+            await connection.query('INSERT INTO users (rfc, first_name, last_name) VALUES (?, ?, ?)', [rfc, first_name, last_name]);
+            res.status(201).json({message:"Usuario agregado"});
+        }
+    
+        
+        // getAllAccountNumber(req, res).then(result => {
+        //     if(result.length>0){
+        //         if(account_number in result){
+        //             res.status(400).json({message:"Cuenta ya existe"});
+        //         }
+        //         else{
+        //             if(account_number.length===16 && first_four_digits==='4152' && tipo_cuenta==='Personal'){
+
+        //                 const user = { rfc, first_name, last_name };
+
+        //                 const connection = await getConnection();
+        //                 await connection.query("INSERT INTO users SET ?", user);
+        //                 res.json({message:'User added successfully'});
+
+        //                 await connection.query("INSERT INTO cuenta_personal SET ?", {id, c_personal:account_number});
+        //                 res.json({message:"num cuenta personal creada"});
+        //             }
+        //             else if(account_number.length===16 && first_four_digits==='3142' && tipo_cuenta==='Empresarial'){
+
+        //                 const user = { rfc, first_name, last_name };
+
+        //                 const connection = await getConnection();
+        //                 await connection.query("INSERT INTO users SET ?", user);
+        //                 res.json({message:'User added successfully'});
+
+        //                 await connection.query("INSERT INTO cuenta_empresarial SET ?", {id, c_empresarial:account_number});
+        //                 res.json({message:"num cuenta empresarial creada"});
+        //             }
+        //             else{
+        //                 res.status(400).json({message:"Account number invalid"});
+        //             }
+        //         }
+        //     }
+        // })
+
+        
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+const setAccountNumber = async (req, res) => {
+    try{
+        const { id } = req.params;
+
+        //generate 16 digit account number
 
         const connection = await getConnection();
-        await connection.query("INSERT INTO users SET ?", user);
-        res.json({message:'User added successfully'});
+
+        //evalue first 4 digits of account number
+        
     }
     catch(error){
         res.status(500);
