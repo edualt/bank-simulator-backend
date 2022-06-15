@@ -12,4 +12,9 @@ router.get("/verifyAccountNumber", UserMethods.getAllAccountNumber);
 router.get("/personal/:id", UserMethods.getPersonalAccount);
 router.get("/empresarial/:id", UserMethods.getEmpresarialAccount);
 router.post("/rfc", UserMethods.getIdbyRFC);
+router.post("/transfer", UserMethods.transfer);
+router.post("/deposit", UserMethods.deposit);
+router.post("/withdraw", UserMethods.withdraw);
+router.post("/deleteAccount", UserMethods.deleteAccount);
+
 export default router;

@@ -208,6 +208,147 @@ const getIdbyRFC = async (req, res) => {
     }
 }
 
+const transfer = async (req, res) => {
+    try{
+        const { id } = req.params;
+        const { cuenta_origen, cuenta_destino, monto } = req.body;
+        const connection = await getConnection();
+
+        if(cuenta_origen === cuenta_destino){
+            res.status(400).json({ message: "No se puede transferir a la misma cuenta" });
+        }
+        else if(cuenta_origen.substring(0,1) == "4"){
+            const result = await connection.query('SELECT * FROM cuenta_personal WHERE c_personal = ?', [cuenta_origen]); //verify if personal account exists
+            if(result.length > 0){
+                const result2 = await connection.query('SELECT * FROM cuenta_personal WHERE c_personal = ?', [cuenta_destino]); //verify if personal account exists to transfer to
+                const reult2_2 = await connection.query('SELECT * FROM cuenta_empresarial WHERE c_empresarial = ?', [cuenta_destino]); //verify if empresarial account exists to transfer to
+                if(result2.length > 0 || reult2_2.length > 0){ //if any of the accounts exists
+                    if(result[0].saldo >= monto){
+                        await connection.query('UPDATE cuenta_personal SET saldo = saldo - ? WHERE c_personal = ?', [monto, cuenta_origen]);
+                        if(cuenta_destino.substring(0,1) == "4"){
+                            await connection.query('UPDATE cuenta_personal SET saldo = saldo + ? WHERE c_personal = ?', [monto, cuenta_destino]);
+                            res.json({ message: "Transferencia exitosa" });
+                        }
+                        else{
+                            await connection.query('UPDATE cuenta_empresarial SET saldo = saldo + ? WHERE c_empresarial = ?', [monto, cuenta_destino]);
+                            res.json({ message: "Transferencia exitosa" });
+                        }   
+                    }
+                    else{
+                        res.status(400).json({ message: "Saldo insuficiente" });
+                    }
+                }
+                else{
+                    res.status(400).json({ message: "Cuenta destino no existe" });
+                }
+            }
+            else{
+                res.status(400).json({ message: "Cuenta origen no existe" });
+            }
+        }
+        else if(cuenta_origen.substring(0,1) == "3"){
+            const result = await connection.query('SELECT * FROM cuenta_empresarial WHERE c_empresarial = ?', [cuenta_origen]); //verify if empresarial account exists
+            if(result.length > 0){
+                const result2 = await connection.query('SELECT * FROM cuenta_empresarial WHERE c_empresarial = ?', [cuenta_destino]); //verify if empresarial account exists to transfer to
+                const result2_2 = await connection.query('SELECT * FROM cuenta_personal WHERE c_personal = ?', [cuenta_destino]); //verify if personal account exists to transfer to
+                if(result2.length > 0 || result2_2.length > 0){ //if any of the accounts exists
+                    await connection.query('SELECT * FROM cuenta_empresarial WHERE c_empresarial = ?', [cuenta_origen]);
+                    if(result[0].saldo >= monto){
+                        const result4 = await connection.query('UPDATE cuenta_empresarial SET saldo = saldo - ? WHERE c_empresarial = ?', [monto, cuenta_origen]);
+                        if(cuenta_destino.substring(0,1) == "4"){
+                            await connection.query('UPDATE cuenta_personal SET saldo = saldo + ? WHERE c_personal = ?', [monto, cuenta_destino]);
+                            res.json({ message: "Transferencia exitosa" });
+                        }
+                        else{
+                            await connection.query('UPDATE cuenta_empresarial SET saldo = saldo + ? WHERE c_empresarial = ?', [monto, cuenta_destino]);
+                            res.json({ message: "Transferencia exitosa" });
+                        } 
+                    }
+                    else{
+                        res.status(400).json({ message: "Saldo insuficiente" });
+                    }
+                }
+                else{
+                    res.status(400).json({ message: "Cuenta destino no existe" });
+                }
+            }
+            else{
+                res.status(400).json({ message: "Cuenta origen no existe" });
+            }
+        }
+        else{
+            res.status(400).json({ message: "Cuenta origen no existe" });
+        }
+    
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+const deposit = async (req, res) => {
+    try{
+        const { cuenta_origen, monto } = req.body;
+        const connection = await getConnection();
+
+        if(cuenta_origen.substring(0,1) == "4"){
+            connection.query('UPDATE cuenta_personal SET saldo = saldo + ? WHERE c_personal = ?', [monto, cuenta_origen]);
+            res.json({ message: "Deposito exitoso" });
+        }
+        else{
+            connection.query('UPDATE cuenta_empresarial SET saldo = saldo + ? WHERE c_empresarial = ?', [monto, cuenta_origen]);
+            res.json({ message: "Deposito exitoso" });
+        }
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+const withdraw = async (req, res) => {
+    try{
+        const { cuenta_origen, monto } = req.body;
+
+        const connection = await getConnection();
+
+        if(cuenta_origen.substring(0,1) == "4"){
+            await connection.query('UPDATE cuenta_personal SET saldo = saldo - ? WHERE c_personal = ?', [monto, cuenta_origen]);
+            res.json({ message: "Retiro exitoso" });
+        }
+        else{
+            await connection.query('UPDATE cuenta_empresarial SET saldo = saldo - ? WHERE c_empresarial = ?', [monto, cuenta_origen]);
+            res.json({ message: "Retiro exitoso" });
+        }
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+const deleteAccount = async (req, res) => {
+    try{
+        const { account_number } = req.body;
+        const connection = await getConnection();
+
+        if(account_number.substring(0,1) == "4"){
+            await connection.query('DELETE FROM cuenta_personal WHERE c_personal = ?', [account_number]);
+            res.json({ message: "Cuenta eliminada" });
+        }
+        else{
+            await connection.query('DELETE FROM cuenta_empresarial WHERE c_empresarial = ?', [account_number]);
+            res.json({ message: "Cuenta eliminada" });
+        }
+    }
+    catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+}
+
+
 export const methods = {
     getUsers,
     getUser,
@@ -217,5 +358,9 @@ export const methods = {
     getAllAccountNumber,
     getPersonalAccount,
     getEmpresarialAccount,
-    getIdbyRFC
+    getIdbyRFC,
+    transfer,
+    deposit,
+    withdraw,
+    deleteAccount
 };

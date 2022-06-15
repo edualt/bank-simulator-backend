@@ -70,9 +70,9 @@ SELECT * FROM info_user;
 
 SELECT u.id, u.rfc, u.first_name, u.last_name, p.c_personal, p.nip, p.saldo, e.c_empresarial, e.nip, e.saldo FROM users u INNER JOIN cuenta_personal p ON u.id = p.id INNER JOIN cuenta_empresarial e ON u.id = e.id;
 
-SELECT * FROM users;
-SELECT * FROM cuenta_personal where id=9;
-SELECT * FROM cuenta_empresarial WHERE id=9;
+SELECT * FROM users where id=11;
+SELECT * FROM cuenta_personal where id=11;
+SELECT * FROM cuenta_empresarial WHERE id=11;
 
 (SELECT * FROM cuenta_personal where id=1) UNION (SELECT * FROM cuenta_empresarial WHERE id=1);
 
@@ -86,5 +86,8 @@ SELECT u.id, e.c_empresarial, e.nip FROM users u INNER JOIN cuenta_empresarial e
 ALTER TABLE users DROP PRIMARY KEY;
 ALTER TABLE migrations ADD id INT PRIMARY KEY AUTO_INCREMENT;
 
-SELECT * FROM cuenta_personal WHERE id=11;
-SELECT * FROM users u JOIN cuenta_personal p ON u.id=9=p.id=9;
+SELECT * FROM cuenta_empresarial;
+SELECT * FROM users u JOIN cuenta_personal p ON u.id=11 and p.id=11;
+
+UPDATE cuenta_empresarial SET saldo = saldo - 100 WHERE c_empresarial = "3142878819774477";
+UPDATE cuenta_personal SET saldo = saldo + 12000 WHERE c_personal = "4152970488681747";
