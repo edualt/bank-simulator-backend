@@ -314,12 +314,28 @@ const withdraw = async (req, res) => {
         const connection = await getConnection();
 
         if(cuenta_origen.substring(0,1) == "4"){
-            await connection.query('UPDATE cuenta_personal SET saldo = saldo - ? WHERE c_personal = ?', [monto, cuenta_origen]);
-            res.json({ message: "Retiro exitoso" });
+            const result = await connection.query('SELECT * FROM cuenta_personal WHERE c_personal = ?', [cuenta_origen]); //verify if personal account exists
+            if(result.length > 0){
+                if(result[0].saldo >= monto){
+                    await connection.query('UPDATE cuenta_personal SET saldo = saldo - ? WHERE c_personal = ?', [monto, cuenta_origen]);
+                    res.json({ message: "Retiro exitoso" });
+                }
+                else{
+                    res.status(400).json({ message: "Saldo insuficiente" });
+                }
+            }
         }
         else{
-            await connection.query('UPDATE cuenta_empresarial SET saldo = saldo - ? WHERE c_empresarial = ?', [monto, cuenta_origen]);
-            res.json({ message: "Retiro exitoso" });
+            const result = await connection.query('SELECT * FROM cuenta_empresarial WHERE c_empresarial = ?', [cuenta_origen]); //verify if empresarial account exists
+            if(result.length > 0){
+                if(result[0].saldo >= monto){
+                    await connection.query('UPDATE cuenta_empresarial SET saldo = saldo - ? WHERE c_empresarial = ?', [monto, cuenta_origen]);
+                    res.json({ message: "Retiro exitoso" });
+                }
+                else{
+                    res.status(400).json({ message: "Saldo insuficiente" });
+                }
+            }
         }
     }
     catch(error){
@@ -347,6 +363,7 @@ const deleteAccount = async (req, res) => {
         res.send(error.message);
     }
 }
+
 
 
 export const methods = {

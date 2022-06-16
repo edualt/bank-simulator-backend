@@ -16,7 +16,7 @@ POST http://127.0.0.1:4000/api/users/deleteAccount HTTP/1.1
 Content-Type: application/json
 
 {
-    "account_number": "3142012841836918"
+    "account_number": "4152789932238476"
 }
 
 ###
@@ -34,8 +34,8 @@ POST http://127.0.0.1:4000/api/users/transfer HTTP/1.1
 Content-Type: application/json
 
 {
-    "cuenta_origen": "4152970488681747",
-    "cuenta_destino": "3142878819774477",
+    "cuenta_origen": "4152592406905511",
+    "cuenta_destino": "",
     "monto": "500"
 }
 
@@ -45,7 +45,7 @@ POST http://127.0.0.1:4000/api/users/deposit HTTP/1.1
 Content-Type: application/json
 
 {
-    "cuenta_origen": "4152640972944370",
+    "cuenta_origen": "4152592406905511",
     "monto": "500"
 }
 
